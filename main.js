@@ -120,24 +120,22 @@
     }
 
     async render() {
-      if (!this._myDataSource || this._myDataSource.state !== "success") {
-        return;
-      } else {
-        const startTimestamp =
-          this._myDataSource.metadata.feeds.dimensions.values[0];
-        const endTimestamp =
-          this._myDataSource.metadata.feeds.dimensions.values[1];
-        const event = this._myDataSource.metadata.feeds.dimensions.values[2];
-        const data = this._myDataSource.data.map((data) => {
-               return {
-    	startDate: new Date(data[startTimestamp].label),
-    	endDate: new Date(data[endTimestamp].label),
-    	event: data[event].label
-  		};	
-	});
+    if (!this._myDataSource || this._myDataSource.state !== "success") {
+      return;
+    } else {
+      const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
+      const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
+      const event = this._myDataSource.metadata.feeds.dimensions.values[2];
+      const data = this._myDataSource.data.map((data) => {
+        return {
+          startDate: parseDate(data[startTimestamp].label),
+          endDate: parseDate(data[endTimestamp].label),
+          event: data[event].label,
+        };
+      });
 
-        this.events = data;
-      }
+      this.events = data;
+    }
 
       this.renderYearOptions();
       this.renderCalendar();
