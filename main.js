@@ -415,5 +415,5 @@
     }
   }
 
-  customElements.define("dev-event-calendar", ColoredBox);
+  customElements.define("com.safisch.calendarpublic", ColoredBox);
 })();
