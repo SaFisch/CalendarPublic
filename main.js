@@ -129,8 +129,7 @@
           this._myDataSource.metadata.feeds.dimensions.values[1];
         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
         const data = this._myDataSource.data.map((data) => {
-          return {
-            return {
+               return {
     	startDate: new Date(data[startTimestamp].label),
     	endDate: new Date(data[endTimestamp].label),
     	event: data[event].label
