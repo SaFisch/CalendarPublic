@@ -130,7 +130,10 @@
         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
         const data = this._myDataSource.data.map((data) => {
           return {
-            startDate: this.parseDate(data[startTimestamp].label),
+            startDate: this.parseDate(dparseDate(dateString) {
+              const [day, month, year] = dateString.split(".");
+               return new Date(year, month - 1, day); // Beachte: Monat ist 0-basiert
+               }
             endDate: this.parseDate(data[endTimestamp].label),
             event: data[event].label,
           };
