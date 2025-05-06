@@ -1,111 +1,106 @@
 (function () {
   let template = document.createElement("template");
   template.innerHTML = `
-	 <style>
+    <style>
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
 
-		.header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 10px;
-		}
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-gap: 2px; 
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
 
-		.calendar {
-			display: grid;
-			grid-template-columns: repeat(7, 1fr);
-			grid-gap: 2px; 
-			text-align: center;
-			position: relative;
-            			z-index: 1;
-		}
+      .day {
+        border: 1px solid #ddd; 
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        height: 150px;
+        z-index: 1;
+      }
 
-		.day {
-			border: 1px solid #ddd; 
-			display: flex;
-			flex-direction: column;
-			position: relative;
-			height: 150px;
-			z-index: 1;
-		}
+      .day-number {
+        font-weight: bold;
+        font-size: 14px;
+        height: 25px;
+        background-color: #f0f0f0;
+      }
 
-		.day-number {
-			font-weight: bold;
-			font-size: 14px;
-			height: 25px;
-			background-color: #f0f0f0;
-		}
+      .event-space {
+        flex-grow: 1;
+        background-color: #fafafa;
+        position: relative;
+        z-index: 5;
+      }
 
-		.event-space {
-			flex-grow: 1;
-			background-color: #fafafa;
-			
-			position: relative;
-			z-index: 5;
-		}
+      .event-item {
+        position: absolute;
+        margin: 0; 
+        padding: 5px;
+        background-color: #e0f7fa;
+        font-size: 12px;
+        height: 12px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        z-index: 10;
+      }
 
-		.event-item {
-			position: absolute;
-			margin: 0; 
-			padding: 5px;
-			background-color: #e0f7fa;
-			font-size: 12px;
-			height: 12px;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			z-index: 10;
-		}
+      .event-item.continuous {
+        border-radius: 0px;
+        width: 100%; 
+        background-color: #b3e5fc; 
+        z-index: 10;
+        position: absolute;
+      }
 
-		.event-item.continuous {
-        			border-radius: 0px;
-			width: 100% ; 
-			background-color: #b3e5fc; 
-            			z-index: 10;
-                          position: absolute;
-                          
+      .day-header {
+        font-weight: bold;
+        background-color: #f0f0f0;
+        padding: 5px;
+      }
 
-		}
+      select {
+        padding: 5px;
+        font-size: 14px;
+      }
+    </style>
 
-		.day-header {
-			font-weight: bold;
-			background-color: #f0f0f0;
-			padding: 5px;
-		}
+    <div class="header">
+      <select id="monthSelect">
+        <option value="0">January</option>
+        <option value="1">February</option>
+        <option value="2">March</option>
+        <option value="3">April</option>
+        <option value="4">May</option>
+        <option value="5">June</option>
+        <option value="6">July</option>
+        <option value="7">August</option>
+        <option value="8">September</option>
+        <option value="9">October</option>
+        <option value="10">November</option>
+        <option value="11">December</option>
+      </select>
+      <select id="yearSelect"></select>
+    </div>
 
-		select {
-			padding: 5px;
-			font-size: 14px;
-		}
-
-		</style>
-
-		<div class="header">
-			<select id="monthSelect">
-				<option value="0">January</option>
-				<option value="1">February</option>
-				<option value="2">March</option>
-				<option value="3">April</option>
-				<option value="4">May</option>
-				<option value="5">June</option>
-				<option value="6">July</option>
-				<option value="7">August</option>
-				<option value="8">September</option>
-				<option value="9">October</option>
-				<option value="10">November</option>
-				<option value="11">December</option>
-			</select>
-			<select id="yearSelect"></select>
-		</div>
-
-		<div class="calendar">
-			<div class="day-header">Mon</div>
-			<div class="day-header">Tue</div>
-			<div class="day-header">Wed</div>
-			<div class="day-header">Thu</div>
-			<div class="day-header">Fri</div>
-			<div class="day-header">Sat</div>
-			<div class="day-header">Sun</div>
-		</div>
-	`;
+    <div class="calendar">
+      <div class="day-header">Mon</div>
+      <div class="day-header">Tue</div>
+      <div class="day-header">Wed</div>
+      <div class="day-header">Thu</div>
+      <div class="day-header">Fri</div>
+      <div class="day-header">Sat</div>
+      <div class="day-header">Sun</div>
+    </div>
+  `;
 
   class ColoredBox extends HTMLElement {
     constructor() {
@@ -119,42 +114,39 @@
       this.render();
     }
 
- async render() {
-  if (!this._myDataSource || this._myDataSource.state !== "success") {
-    return;
-  } else {
-    const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
-    const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
-    const event = this._myDataSource.metadata.feeds.dimensions.values[2];
-    const data = this._myDataSource.data.map((data) => {
-      return {
-        startDate: new Date(data[startTimestamp].label),
-        endDate: new Date(data[endTimestamp].label),
-        event: data[event].label
-      };
-    });
+    async render() {
+      if (!this._myDataSource || this._myDataSource.state !== "success") {
+        return;
+      }
 
-    this.events = data;
-  }
+      const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
+      const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
+      const event = this._myDataSource.metadata.feeds.dimensions.values[2];
 
-  this.renderYearOptions();
-  this.renderCalendar();
+      const data = this._myDataSource.data.map((dataItem) => {
+        return {
+          startDate: new Date(dataItem[startTimestamp].label),
+          endDate: new Date(dataItem[endTimestamp].label),
+          event: dataItem[event].label
+        };
+      });
 
-  this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
-  this.shadowRoot
-    .getElementById("yearSelect")
-    .addEventListener("change", (event) => {
-      this.currentYear = parseInt(event.target.value);
+      this.events = data;
+
+      this.renderYearOptions();
       this.renderCalendar();
-    });
 
-  this.shadowRoot
-    .getElementById("monthSelect")
-    .addEventListener("change", (event) => {
-      this.currentMonth = parseInt(event.target.value);
-      this.renderCalendar();
-    });
-}
+      this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
+      this.shadowRoot.getElementById("yearSelect").addEventListener("change", (event) => {
+        this.currentYear = parseInt(event.target.value);
+        this.renderCalendar();
+      });
+
+      this.shadowRoot.getElementById("monthSelect").addEventListener("change", (event) => {
+        this.currentMonth = parseInt(event.target.value);
+        this.renderCalendar();
+      });
+    }
 
     set myDataSource(dataBinding) {
       this._myDataSource = dataBinding;
@@ -181,21 +173,17 @@
     renderCalendar() {
       let calendar = this.shadowRoot.querySelector(".calendar");
       calendar.innerHTML = `
-				<div class="day-header">Mon</div>
-				<div class="day-header">Tue</div>
-				<div class="day-header">Wed</div>
-				<div class="day-header">Thu</div>
-				<div class="day-header">Fri</div>
-				<div class="day-header">Sat</div>
-				<div class="day-header">Sun</div>
-			`;
+        <div class="day-header">Mon</div>
+        <div class="day-header">Tue</div>
+        <div class="day-header">Wed</div>
+        <div class="day-header">Thu</div>
+        <div class="day-header">Fri</div>
+        <div class="day-header">Sat</div>
+        <div class="day-header">Sun</div>
+      `;
 
       let daysInMonth = this.daysInMonth(this.currentYear, this.currentMonth);
-      let firstDayOfMonth = new Date(
-        this.currentYear,
-        this.currentMonth,
-        1
-      ).getDay();
+      let firstDayOfMonth = new Date(this.currentYear, this.currentMonth, 1).getDay();
       let adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
 
       this.events.forEach(function (element) {
@@ -210,9 +198,6 @@
       }
 
       for (let i = 1; i <= daysInMonth; i++) {
-        var y = 0;
-        var z = 0;
-
         let dayElement = document.createElement("div");
         dayElement.className = "day";
 
@@ -224,125 +209,38 @@
         eventSpace.className = "event-space";
 
         let eventsForDay = this.events.filter((event) => {
-          let eventStartDate = new Date(
-            new Date(event.startDate).toDateString()
-          );
+          let eventStartDate = new Date(new Date(event.startDate).toDateString());
           let eventEndDate = new Date(new Date(event.endDate).toDateString());
           let dayDate = new Date(this.currentYear, this.currentMonth, i);
           return (
             eventStartDate <= dayDate &&
             eventEndDate >= dayDate &&
-            event.hidden == false
+            event.hidden === false
           );
         });
 
-        let dayDate = new Date(this.currentYear, this.currentMonth, i);
-
-        let l = 0;
-
-        eventsForDay.forEach((event) => {});
-
-        eventsForDay.forEach((event) => {
-          if (event.position != null) {
-            [eventsForDay[z], eventsForDay[event.position]] = [
-              eventsForDay[event.position],
-              eventsForDay[z],
-            ];
-          }
-          if (event.position == null) {
-            event.position = z;
-          }
-          z++;
-        });
-
-        eventsForDay.forEach((event) => {
-          l++;
-
-          if (typeof event == "undefined") {
-            return;
-          }
-
-          if (l > 4) {
-            event.hidden = true;
-            return;
-          } else if (event.hidden == true) {
-            return;
-          }
-
+        eventsForDay.forEach((event, index) => {
           let eventItem = document.createElement("div");
           eventItem.className = "event-item";
+          eventItem.textContent = event.event;
 
           let eventStartDate = new Date(event.startDate);
           let eventEndDate = new Date(event.endDate);
-
           let startHour = eventStartDate.getHours();
           let endHour = eventEndDate.getHours();
           let totalHours = 24;
           let hourHeight = 100 / totalHours;
 
-          if (eventStartDate.toDateString() !== eventEndDate.toDateString()) {
-            eventItem.classList.add("continuous");
-
-            if (
-              24 - startHour >= endHour &&
-              this.convertMiliseconds(
-                new Date(eventEndDate.toDateString()).getTime() -
-                  new Date(eventStartDate.toDateString()).getTime(),
-                "d"
-              ) <= 1 &&
-              eventStartDate.getDate() == dayDate.getDate()
-            ) {
-              eventItem.textContent = event.event;
-            } else if (
-              24 - startHour < endHour &&
-              this.convertMiliseconds(
-                new Date(eventEndDate.toDateString()).getTime() -
-                  new Date(eventStartDate.toDateString()).getTime(),
-                "d"
-              ) <= 1 &&
-              eventEndDate.getDate() == dayDate.getDate()
-            ) {
-              eventItem.textContent = event.event;
-            } else if (
-              eventStartDate.getDate() + 1 == dayDate.getDate() &&
-              this.convertMiliseconds(
-                new Date(eventEndDate.toDateString()).getTime() -
-                  new Date(eventStartDate.toDateString()).getTime(),
-                "d"
-              ) > 1
-            ) {
-              eventItem.textContent = event.event;
-            } else if (
-              dayDate.getMonth() != eventStartDate.getMonth() &&
-              dayDate.getDate() == 1
-            ) {
-              eventItem.textContent = event.event;
-            }
-
-            if (eventEndDate.getDate() == i) {
-              eventItem.style.width = `${endHour * hourHeight}%`;
-            }
-
-            if (eventStartDate.getDate() == i) {
-              eventItem.style.width = `${(24 - startHour) * hourHeight}%`;
-              eventItem.style.left = `${startHour * hourHeight}%`;
-            }
-
-            eventSpace.appendChild(eventItem);
-          } else {
-            eventItem.style.width = `${(endHour - startHour) * hourHeight}%`;
-            eventItem.style.left = `${startHour * hourHeight}%`;
-            eventItem.style.flexDirection = "row-reverse";
-
-            eventItem.textContent = event.event;
-            eventSpace.appendChild(eventItem);
-          }
+          eventItem.style.width = `${(endHour - startHour) * hourHeight}%`;
+          eventItem.style.left = `${startHour * hourHeight}%`;
 
           if (event.position !== 0) {
             eventItem.style.top = `${event.position * 30}px`;
           } else {
-            eventItem.style.top = `${eventsForDay.indexOf(event) * 30}px`;
+            eventItem.style.top = `${index * 30}px`;
           }
+
+          eventSpace.appendChild(eventItem);
         });
 
         dayElement.appendChild(dayNumber);
@@ -380,28 +278,4 @@
         total_seconds;
 
       total_seconds = parseInt(Math.floor(miliseconds / 1000));
-      total_minutes = parseInt(Math.floor(total_seconds / 60));
-      total_hours = parseInt(Math.floor(total_minutes / 60));
-      days = parseInt(Math.floor(total_hours / 24));
-
-      seconds = parseInt(total_seconds % 60);
-      minutes = parseInt(total_minutes % 60);
-      hours = parseInt(total_hours % 24);
-
-      switch (format) {
-        case "s":
-          return total_seconds;
-        case "m":
-          return total_minutes;
-        case "h":
-          return total_hours;
-        case "d":
-          return days;
-        default:
-          return { d: days, h: hours, m: minutes, s: seconds };
-      }
-    }
-  }
-
-  customElements.define("com-safisch-calendarpublic", ColoredBox);
-})();
+      total_minutes = p_
