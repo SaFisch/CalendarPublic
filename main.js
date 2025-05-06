@@ -130,9 +130,9 @@
         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
         const data = this._myDataSource.data.map((data) => {
           return {
-            startDate: this.parseDate(data[startTimestamp].label),
-            endDate: this.parseDate(data[endTimestamp].label),
-            event: data[event].label,
+             startDate: this.parseDate(data[startTimestamp].label),
+             endDate: this.parseDate(data[endTimestamp].label),
+             event: data[event].label,
           };
         });
 
