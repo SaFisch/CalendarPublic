@@ -135,18 +135,17 @@
      if (!this._myDataSource || this._myDataSource.state !== "success") {
     return;
      }
-        const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
-        const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
-        const event = this._myDataSource.metadata.feeds.dimensions.values[2];
+         const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
+         const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
+         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
 
-     const data = this._myDataSource.data.map((dataItem) => {
-       return {
-      startDate: this.parseDate(dataItem[startTimestamp]?.label),  // Sicherstellen, dass `label` existiert
-      endDate: this.parseDate(dataItem[endTimestamp]?.label),      // Sicherstellen, dass `label` existiert
-      event: dataItem[event]?.label || '',                          // Sicherstellen, dass `label` existiert
-       };
-     });
-
+      const data = this._myDataSource.data.map((dataItem) => {
+        return {
+          startDate: this.parseDate(dataItem[startTimestamp]),
+          endDate: this.parseDate(dataItem[endTimestamp]),
+          event: dataItem[event] || '',  // direkt, kein .label
+        };
+      });
      this.events = data;
 
      this.renderYearOptions();
