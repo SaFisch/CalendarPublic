@@ -249,42 +249,12 @@
            );
          });
  
-         let dayDate = new Date(this.currentYear, this.currentMonth, i);
- 
-         let l = 0;
- 
-         eventsForDay.forEach((event) => {});
- 
-         eventsForDay.forEach((event) => {
-           if (event.position != null) {
-             [eventsForDay[z], eventsForDay[event.position]] = [
-               eventsForDay[event.position],
-               eventsForDay[z],
-             ];
-           }
-           if (event.position == null) {
-             event.position = z;
-           }
-           z++;
-         });
- 
-         eventsForDay.forEach((event) => {
-           l++;
- 
-           if (typeof event == "undefined") {
-             return;
-           }
- 
-           if (l > 4) {
-             event.hidden = true;
-             return;
-           } else if (event.hidden == true) {
-             return;
-           }
+         eventsForDay.forEach((event, index) => {
  
            let eventItem = document.createElement("div");
            eventItem.className = "event-item";
- 
+           eventItem.textContent = event.event;
+            
            let eventStartDate = new Date(event.startDate);
            let eventEndDate = new Date(event.endDate);
  
@@ -293,69 +263,15 @@
            let totalHours = 24;
            let hourHeight = 100 / totalHours;
  
-           if (eventStartDate.toDateString() !== eventEndDate.toDateString()) {
-             eventItem.classList.add("continuous");
- 
-             if (
-               24 - startHour >= endHour &&
-               this.convertMiliseconds(
-                 new Date(eventEndDate.toDateString()).getTime() -
-                   new Date(eventStartDate.toDateString()).getTime(),
-                 "d"
-               ) <= 1 &&
-               eventStartDate.getDate() == dayDate.getDate()
-             ) {
-               eventItem.textContent = event.event;
-             } else if (
-               24 - startHour < endHour &&
-               this.convertMiliseconds(
-                 new Date(eventEndDate.toDateString()).getTime() -
-                   new Date(eventStartDate.toDateString()).getTime(),
-                 "d"
-               ) <= 1 &&
-               eventEndDate.getDate() == dayDate.getDate()
-             ) {
-               eventItem.textContent = event.event;
-             } else if (
-               eventStartDate.getDate() + 1 == dayDate.getDate() &&
-               this.convertMiliseconds(
-                 new Date(eventEndDate.toDateString()).getTime() -
-                   new Date(eventStartDate.toDateString()).getTime(),
-                 "d"
-               ) > 1
-             ) {
-               eventItem.textContent = event.event;
-             } else if (
-               dayDate.getMonth() != eventStartDate.getMonth() &&
-               dayDate.getDate() == 1
-             ) {
-               eventItem.textContent = event.event;
-             }
- 
-             if (eventEndDate.getDate() == i) {
-               eventItem.style.width = `${endHour * hourHeight}%`;
-             }
- 
-             if (eventStartDate.getDate() == i) {
-               eventItem.style.width = `${(24 - startHour) * hourHeight}%`;
-               eventItem.style.left = `${startHour * hourHeight}%`;
-             }
- 
-             eventSpace.appendChild(eventItem);
-           } else {
-             eventItem.style.width = `${(endHour - startHour) * hourHeight}%`;
-             eventItem.style.left = `${startHour * hourHeight}%`;
-             eventItem.style.flexDirection = "row-reverse";
- 
-             eventItem.textContent = event.event;
-             eventSpace.appendChild(eventItem);
-           }
+           eventItem.style.width = `${(endHour - startHour) * hourHeight}%`;
+           eventItem.style.left = `${startHour * hourHeight}%`;
  
            if (event.position !== 0) {
              eventItem.style.top = `${event.position * 30}px`;
            } else {
-             eventItem.style.top = `${eventsForDay.indexOf(event) * 30}px`;
+             eventItem.style.top = `${index * 30}px`;
            }
+              eventSpace.appendChild(eventItem);
          });
  
          dayElement.appendChild(dayNumber);
