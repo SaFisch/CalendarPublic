@@ -334,3 +334,4 @@
  
    customElements.define("com-safisch-calendarpublic", ColoredBox);
  })();
+   total_minutes = p_
