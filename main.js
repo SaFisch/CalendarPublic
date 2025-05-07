@@ -131,6 +131,7 @@
     }
 
      async render() {
+        console.log('Render-Methode aufgerufen'); // Füge diese Zeile hinzu
      if (!this._myDataSource || this._myDataSource.state !== "success") {
     return;
      }
