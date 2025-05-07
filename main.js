@@ -141,12 +141,12 @@
           startDate: this.parseDate(dataItem[startTimestamp].label),
           endDate: this.parseDate(dataItem[endTimestamp].label),
           event: dataItem[event].label,
-        };
-      });
+              };
+            });
 
       this.events = data;
       }
-
+      
       this.renderYearOptions();
       this.renderCalendar();
 
