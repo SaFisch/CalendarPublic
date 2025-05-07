@@ -131,7 +131,8 @@
    }
 
      async render() {
-        console.log('Render-Methode aufgerufen'); // Füge diese Zeile hinzu
+        console.log('Render-Methode aufgerufen'); // zur Sicherheit
+        console.log('DataSource:', this._myDataSource); // <- HIER
      if (!this._myDataSource || this._myDataSource.state !== "success") {
     return;
      }
