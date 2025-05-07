@@ -245,7 +245,7 @@
            return (
              eventStartDate <= dayDate &&
              eventEndDate >= dayDate &&
-             event.hidden == false
+             event.hidden === false
            );
          });
  
