@@ -145,7 +145,7 @@
             });
 
       this.events = data;
-      }
+      
       
       this.renderYearOptions();
       this.renderCalendar();
