@@ -118,7 +118,7 @@
  
         this.render();
     }
-
+   
     async render() {
       if (!this._myDataSource || this._myDataSource.state !== "success") {
         return;
@@ -128,14 +128,21 @@
         const endTimestamp =
           this._myDataSource.metadata.feeds.dimensions.values[1];
         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
-        const data = this._myDataSource.data.map((data) => {
-          return {
-      	   startDate: new Date(data[startTimestamp].label),
-      	   endDate: new Date(data[endTimestamp].label),
-      	   event: data[event].label
-    		   };	
-        	});
-        this.events = data;
+      parseDate(dateString) {
+        if (!dateString) return null;
+         const [datePart, timePart] = dateString.split(" ");
+         const [day, month, year] = datePart.split(".").map(Number);
+         const [hours, minutes, seconds] = timePart.split(":").map(Number);
+            return new Date(year, month - 1, day, hours, minutes, seconds);
+         }
+      const data = this._myDataSource.data.map((dataItem) => {
+        return {
+             startDate: this.parseDate(dataItem[startTimestamp].label),
+             endDate: this.parseDate(dataItem[endTimestamp].label),
+             event: dataItem[event].label,
+           };
+         });
+      this.events = data;
       }
 
       this.renderYearOptions();
