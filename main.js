@@ -152,11 +152,12 @@ showNoDataMessage() {
 }
 
 
-    set myDataSource(dataBinding) {
-  console.log("Datenquelle gesetzt:", dataBinding);
+   set myDataSource(dataBinding) {
+  console.log("Datenquelle gesetzt:", dataBinding); // Überprüfen Sie den Wert der Quelle
   this._myDataSource = dataBinding;
   this.render();
 }
+
     renderYearOptions() {
       let yearSelect = this.shadowRoot.getElementById("yearSelect");
       let currentYear = new Date().getFullYear();
