@@ -120,15 +120,15 @@
     }
    
     parseDate(dateString) {
-      if (!dateString) return null;
-      const [datePart, timePart] = dateString.split(" ");
-      const [day, month, year] = datePart.split(".").map(Number);
-      const [hours, minutes, seconds] = timePart.split(":").map(Number);
-      return new Date(year, month - 1, day, hours, minutes, seconds);
-       console.log(`Parsed Datum: ${dateString} -> ${parsedDate}`);
+     if (!dateString) return null;
+        const [datePart, timePart] = dateString.split(" ");
+        const [day, month, year] = datePart.split(".").map(Number);
+        const [hours, minutes, seconds] = timePart.split(":").map(Number);
   
-     return parsedDate;
-    }
+        const parsedDate = new Date(year, month - 1, day, hours, minutes, seconds);
+        console.log(`Parsed Datum: ${dateString} -> ${parsedDate}`);
+        return parsedDate;
+   }
 
      async render() {
         console.log('Render-Methode aufgerufen'); // Füge diese Zeile hinzu
