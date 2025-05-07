@@ -127,45 +127,43 @@
       return new Date(year, month - 1, day, hours, minutes, seconds);
     }
 
-    async render() {
-      if (!this._myDataSource || this._myDataSource.state !== "success") {
-        return;
+     async render() {
+     if (!this._myDataSource || this._myDataSource.state !== "success") {
+    return;
+     }
+        const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
+        const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
+        const event = this._myDataSource.metadata.feeds.dimensions.values[2];
+
+     const data = this._myDataSource.data.map((dataItem) => {
+       return {
+      startDate: this.parseDate(dataItem[startTimestamp]?.label),  // Sicherstellen, dass `label` existiert
+      endDate: this.parseDate(dataItem[endTimestamp]?.label),      // Sicherstellen, dass `label` existiert
+      event: dataItem[event]?.label || '',                          // Sicherstellen, dass `label` existiert
+       };
+     });
+
+     this.events = data;
+
+     this.renderYearOptions();
+     this.renderCalendar();
+
+     this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
+     this.shadowRoot
+       .getElementById("yearSelect")
+       .addEventListener("change", (event) => {
+         this.currentYear = parseInt(event.target.value);
+         this.renderCalendar();
+       });
+
+     this.shadowRoot
+       .getElementById("monthSelect")
+       .addEventListener("change", (event) => {
+         this.currentMonth = parseInt(event.target.value);
+         this.renderCalendar();
+       });
       }
 
-      const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
-      const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
-      const event = this._myDataSource.metadata.feeds.dimensions.values[2];
-
-      const data = this._myDataSource.data.map((dataItem) => {
-        return {
-          startDate: this.parseDate(dataItem[startTimestamp].label),
-          endDate: this.parseDate(dataItem[endTimestamp].label),
-          event: dataItem[event].label,
-              };
-            });
-
-      this.events = data;
-      
-      
-      this.renderYearOptions();
-      this.renderCalendar();
-
- 
-       this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
-       this.shadowRoot
-         .getElementById("yearSelect")
-         .addEventListener("change", (event) => {
-           this.currentYear = parseInt(event.target.value);
-           this.renderCalendar();
-         });
- 
-       this.shadowRoot
-         .getElementById("monthSelect")
-         .addEventListener("change", (event) => {
-           this.currentMonth = parseInt(event.target.value);
-           this.renderCalendar();
-         });
-     }
  
      set myDataSource(dataBinding) {
        this._myDataSource = dataBinding;
