@@ -105,43 +105,52 @@
     }
 
     async render() {
-      console.log('Render-Methode aufgerufen');
+  console.log('Render-Methode aufgerufen'); // Debug-Ausgabe
 
-      if (!this._myDataSource || this._myDataSource.state !== "success") {
-        return;
-      }
+  // Überprüfe den Zustand der Datenquelle
+  if (!this._myDataSource || this._myDataSource.state !== "success") {
+    console.log('Datenquelle ist entweder nicht vorhanden oder nicht erfolgreich geladen');
+    // Zeige eine benutzerfreundliche Nachricht an
+    this.showNoDataMessage();
+    return;
+  }
 
-      const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
-      const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
-      const event = this._myDataSource.metadata.feeds.dimensions.values[2];
+  // Die Struktur der Datenquelle überprüfen
+  console.log('Datenquelle:', this._myDataSource);
 
-      const data = this._myDataSource.data.map((dataItem) => {
-        return {
-          startDate: this.parseDate(dataItem[startTimestamp]),
-          endDate: this.parseDate(dataItem[endTimestamp]),
-          event: dataItem[event] || '',
-        };
-      });
-      this.events = data;
+  const startTimestamp = this._myDataSource.metadata.feeds.dimensions.values[0];
+  const endTimestamp = this._myDataSource.metadata.feeds.dimensions.values[1];
+  const event = this._myDataSource.metadata.feeds.dimensions.values[2];
 
-      this.renderYearOptions();
-      this.renderCalendar();
+  const data = this._myDataSource.data.map((dataItem) => {
+    return {
+      startDate: this.parseDate(dataItem[startTimestamp]),
+      endDate: this.parseDate(dataItem[endTimestamp]),
+      event: dataItem[event] || '',
+    };
+  });
 
-      this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
-      this.shadowRoot
-        .getElementById("yearSelect")
-        .addEventListener("change", (event) => {
-          this.currentYear = parseInt(event.target.value);
-          this.renderCalendar();
-        });
+  // Überprüfen, ob tatsächlich Daten vorhanden sind
+  if (data.length === 0) {
+    console.log('Keine Ereignisse in den Daten');
+    this.showNoDataMessage();
+    return;
+  }
 
-      this.shadowRoot
-        .getElementById("monthSelect")
-        .addEventListener("change", (event) => {
-          this.currentMonth = parseInt(event.target.value);
-          this.renderCalendar();
-        });
-    }
+  this.events = data;
+  this.renderYearOptions();
+  this.renderCalendar();
+}
+
+showNoDataMessage() {
+  // Beispiel für eine einfache Anzeige einer "Keine Daten"-Nachricht
+  const calendar = this.shadowRoot.querySelector(".calendar");
+  const noDataMessage = document.createElement("div");
+  noDataMessage.textContent = "Keine Daten verfügbar";
+  noDataMessage.style.textAlign = "center";
+  calendar.appendChild(noDataMessage);
+}
+
 
     set myDataSource(dataBinding) {
       this._myDataSource = dataBinding;
