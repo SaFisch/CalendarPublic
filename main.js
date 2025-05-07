@@ -1,4 +1,5 @@
- let template = document.createElement("template");
+(function () {
+   let template = document.createElement("template");
    template.innerHTML = `
  	 <style>
  
@@ -105,44 +106,42 @@
  			<div class="day-header">Sun</div>
  		</div>
  	`;
- 
+
    class ColoredBox extends HTMLElement {
      constructor() {
        super();
        let shadowRoot = this.attachShadow({ mode: "open" });
        shadowRoot.appendChild(template.content.cloneNode(true));
- 
+
        this.currentYear = new Date().getFullYear();
        this.currentMonth = new Date().getMonth();
- 
-       this.render();
-     }
- 
-     async render() {
-       if (!this._myDataSource || this._myDataSource.state !== "success") {
-         return;
-       } else {
-         const startTimestamp =
-           this._myDataSource.metadata.feeds.dimensions.values[0];
-         const endTimestamp =
-           this._myDataSource.metadata.feeds.dimensions.values[1];
-         const event = this._myDataSource.metadata.feeds.dimensions.values[2];
-         const data = this._myDataSource.data.map((data) => {
-           return {
-                      };
-             return {
-     	startDate: new Date(data[startTimestamp].label),
-     	endDate: new Date(data[endTimestamp].label),
-     	event: data[event].label
-   		};	
- 	});
- 
-         this.events = data;
-       }
- 
-       this.renderYearOptions();
-       this.renderCalendar();
- 
+
+        this.render();
+    }
+
+    async render() {
+      if (!this._myDataSource || this._myDataSource.state !== "success") {
+        return;
+      } else {
+        const startTimestamp =
+          this._myDataSource.metadata.feeds.dimensions.values[0];
+        const endTimestamp =
+          this._myDataSource.metadata.feeds.dimensions.values[1];
+        const event = this._myDataSource.metadata.feeds.dimensions.values[2];
+        const data = this._myDataSource.data.map((data) => {
+          return {
+          startDate: new Date(data[startTimestamp].label),
+      	   endDate: new Date(data[endTimestamp].label),
+      	   event: data[event].label
+    		   };	
+        	});
+        this.events = data;
+      }
+
+      this.renderYearOptions();
+      this.renderCalendar();
+
+
        this.shadowRoot.getElementById("monthSelect").value = this.currentMonth;
        this.shadowRoot
          .getElementById("yearSelect")
@@ -150,7 +149,7 @@
            this.currentYear = parseInt(event.target.value);
            this.renderCalendar();
          });
- 
+
        this.shadowRoot
          .getElementById("monthSelect")
          .addEventListener("change", (event) => {
@@ -158,16 +157,16 @@
            this.renderCalendar();
          });
      }
- 
+
      set myDataSource(dataBinding) {
        this._myDataSource = dataBinding;
        this.render();
      }
- 
+
      renderYearOptions() {
        let yearSelect = this.shadowRoot.getElementById("yearSelect");
        let currentYear = new Date().getFullYear();
- 
+
        for (let i = currentYear - 50; i <= currentYear + 50; i++) {
          let option = document.createElement("option");
          option.value = i;
@@ -176,11 +175,11 @@
          yearSelect.appendChild(option);
        }
      }
- 
+
      daysInMonth(year, month) {
        return new Date(year, month + 1, 0).getDate();
      }
- 
+
      renderCalendar() {
        let calendar = this.shadowRoot.querySelector(".calendar");
        calendar.innerHTML = `
@@ -192,7 +191,7 @@
  				<div class="day-header">Sat</div>
  				<div class="day-header">Sun</div>
  			`;
- 
+
        let daysInMonth = this.daysInMonth(this.currentYear, this.currentMonth);
        let firstDayOfMonth = new Date(
          this.currentYear,
@@ -200,32 +199,32 @@
          1
        ).getDay();
        let adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
- 
+
        this.events.forEach(function (element) {
          element.position = null;
          element.hidden = false;
        });
- 
+
        for (let i = 0; i < adjustedFirstDay; i++) {
          let emptyCell = document.createElement("div");
          emptyCell.classList.add("empty-cell");
          calendar.appendChild(emptyCell);
        }
- 
+
        for (let i = 1; i <= daysInMonth; i++) {
          var y = 0;
          var z = 0;
- 
+
          let dayElement = document.createElement("div");
          dayElement.className = "day";
- 
+
          let dayNumber = document.createElement("div");
          dayNumber.className = "day-number";
          dayNumber.textContent = i;
- 
+
          let eventSpace = document.createElement("div");
          eventSpace.className = "event-space";
- 
+
          let eventsForDay = this.events.filter((event) => {
            let eventStartDate = new Date(
              new Date(event.startDate).toDateString()
@@ -238,13 +237,13 @@
              event.hidden == false
            );
          });
- 
+
          let dayDate = new Date(this.currentYear, this.currentMonth, i);
- 
+
          let l = 0;
- 
+
          eventsForDay.forEach((event) => {});
- 
+
          eventsForDay.forEach((event) => {
            if (event.position != null) {
              [eventsForDay[z], eventsForDay[event.position]] = [
@@ -257,35 +256,35 @@
            }
            z++;
          });
- 
+
          eventsForDay.forEach((event) => {
            l++;
- 
+
            if (typeof event == "undefined") {
              return;
            }
- 
+
            if (l > 4) {
              event.hidden = true;
              return;
            } else if (event.hidden == true) {
              return;
            }
- 
+
            let eventItem = document.createElement("div");
            eventItem.className = "event-item";
- 
+
            let eventStartDate = new Date(event.startDate);
            let eventEndDate = new Date(event.endDate);
- 
+
            let startHour = eventStartDate.getHours();
            let endHour = eventEndDate.getHours();
            let totalHours = 24;
            let hourHeight = 100 / totalHours;
- 
+
            if (eventStartDate.toDateString() !== eventEndDate.toDateString()) {
              eventItem.classList.add("continuous");
- 
+
              if (
                24 - startHour >= endHour &&
                this.convertMiliseconds(
@@ -321,48 +320,48 @@
              ) {
                eventItem.textContent = event.event;
              }
- 
+
              if (eventEndDate.getDate() == i) {
                eventItem.style.width = `${endHour * hourHeight}%`;
              }
- 
+
              if (eventStartDate.getDate() == i) {
                eventItem.style.width = `${(24 - startHour) * hourHeight}%`;
                eventItem.style.left = `${startHour * hourHeight}%`;
              }
- 
+
              eventSpace.appendChild(eventItem);
            } else {
              eventItem.style.width = `${(endHour - startHour) * hourHeight}%`;
              eventItem.style.left = `${startHour * hourHeight}%`;
              eventItem.style.flexDirection = "row-reverse";
- 
+
              eventItem.textContent = event.event;
              eventSpace.appendChild(eventItem);
            }
- 
+
            if (event.position !== 0) {
              eventItem.style.top = `${event.position * 30}px`;
            } else {
              eventItem.style.top = `${eventsForDay.indexOf(event) * 30}px`;
            }
          });
- 
+
          dayElement.appendChild(dayNumber);
          dayElement.appendChild(eventSpace);
          calendar.appendChild(dayElement);
        }
      }
- 
+
      setData(events) {
        this.events = events;
        this.renderCalendar();
      }
- 
+
      onCustomWidgetBeforeUpdate(changedProperties) {
        this._props = { ...this._props, ...changedProperties };
      }
- 
+
      onCustomWidgetAfterUpdate(changedProperties) {
        if (changedProperties.events) {
          this.setData(changedProperties.events);
@@ -372,7 +371,7 @@
          this.renderCalendar();
        }
      }
- 
+
      convertMiliseconds(miliseconds, format) {
        var days,
          hours,
@@ -381,16 +380,16 @@
          total_hours,
          total_minutes,
          total_seconds;
- 
+
        total_seconds = parseInt(Math.floor(miliseconds / 1000));
        total_minutes = parseInt(Math.floor(total_seconds / 60));
        total_hours = parseInt(Math.floor(total_minutes / 60));
        days = parseInt(Math.floor(total_hours / 24));
- 
+
        seconds = parseInt(total_seconds % 60);
        minutes = parseInt(total_minutes % 60);
        hours = parseInt(total_hours % 24);
- 
+
        switch (format) {
          case "s":
            return total_seconds;
@@ -405,6 +404,6 @@
        }
      }
    }
- 
+
    customElements.define("com-safisch-calendarpublic", ColoredBox);
  })();
